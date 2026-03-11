@@ -169,6 +169,18 @@ export function checkWin(board: Board): boolean {
   return true;
 }
 
+export function flagAllMines(board: Board): Board {
+  const newBoard = cloneBoard(board);
+  for (const row of newBoard) {
+    for (const cell of row) {
+      if (cell.isMine && !cell.isFlagged) {
+        cell.isFlagged = true;
+      }
+    }
+  }
+  return newBoard;
+}
+
 export function revealAllMines(board: Board): Board {
   const newBoard = cloneBoard(board);
   for (const row of newBoard) {

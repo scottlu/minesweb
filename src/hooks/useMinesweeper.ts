@@ -8,6 +8,7 @@ import {
   revealCell,
   toggleFlag,
   checkWin,
+  flagAllMines,
   revealAllMines,
   countFlags,
 } from '../utils/board';
@@ -138,7 +139,7 @@ export function useMinesweeper(settings: GameSettings) {
 
       const won = checkWin(newBoard);
       return {
-        board: newBoard,
+        board: won ? flagAllMines(newBoard) : newBoard,
         status: won ? GameStatus.Won : GameStatus.Playing,
         minePositions,
         minesPlaced,

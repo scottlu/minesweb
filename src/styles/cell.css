@@ -1,0 +1,49 @@
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-weight: 700;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: visible;
+}
+
+.cell-unrevealed {
+  background-color: #c0c0c0;
+  border-top: 3px solid #ffffff;
+  border-left: 3px solid #ffffff;
+  border-bottom: 3px solid #808080;
+  border-right: 3px solid #808080;
+}
+
+.cell-revealed {
+  background-color: #c0c0c0;
+  border: 1px solid #808080;
+}
+
+.cell-mine-hit {
+  background-color: #ff0000;
+  border: 1px solid #808080;
+}
+
+.cell-number {
+  line-height: 1;
+}
+
+.flag-icon {
+  position: absolute;
+  animation: flagAppear 200ms ease-out forwards;
+}
+
+@keyframes flagAppear {
+  0% {
+    transform: scale(3);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

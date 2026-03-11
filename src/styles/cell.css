@@ -39,7 +39,7 @@
 
 @keyframes flagAppear {
   0% {
-    transform: scale(3);
+    transform: scale(6);
     opacity: 0.7;
   }
   100% {

@@ -1,24 +1,39 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Screen, GameStatus } from './types/game';
 import { useMinesweeper } from './hooks/useMinesweeper';
 import { useSettings } from './hooks/useSettings';
 import { Header } from './components/header/header';
 import { GameBoard } from './components/board/gameBoard';
-import { GameOverModal } from './components/gameOver/gameOverModal';
+import { GameEffect } from './components/gameOver/gameEffect';
 import { OptionsScreen } from './components/options/optionsScreen';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>(Screen.Game);
   const { settings, updateSettings } = useSettings();
   const game = useMinesweeper(settings);
+  const [effect, setEffect] = useState<'fireworks' | null>(null);
+  const prevStatusRef = useRef(game.status);
+
+  // Trigger effects on game end
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = game.status;
+
+    if (prev === game.status) return;
+
+    if (game.status === GameStatus.Won) {
+      setEffect('fireworks');
+    }
+  }, [game.status]);
+
+  const handleEffectComplete = useCallback(() => {
+    setEffect(null);
+  }, []);
 
   const handlePlay = useCallback(() => {
     game.newGame();
     setScreen(Screen.Game);
   }, [game.newGame]);
-
-  const showGameOver =
-    game.status === GameStatus.Won || game.status === GameStatus.Lost;
 
   return (
     <div className="flex flex-col h-full">
@@ -37,15 +52,8 @@ export default function App() {
             onReveal={game.handleReveal}
             onFlag={game.handleFlag}
           />
-          {showGameOver && (
-            <GameOverModal
-              status={game.status}
-              time={game.time}
-              settings={settings}
-              onNewGame={game.newGame}
-              onTryAgain={game.tryAgain}
-              onReview={game.review}
-            />
+          {effect && (
+            <GameEffect onComplete={handleEffectComplete} />
           )}
         </>
       )}

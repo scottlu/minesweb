@@ -18,8 +18,10 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
   const [haptic, setHaptic] = useState(true);
+  const [committedWidth, setCommittedWidth] = useState(settings.width);
+  const [committedHeight, setCommittedHeight] = useState(settings.height);
 
-  const maxMines = Math.floor(width * height * 0.8);
+  const maxMines = Math.floor(committedWidth * committedHeight * 0.8);
   const clampedMines = Math.min(mines, maxMines);
 
   const handlePlay = () => {
@@ -50,10 +52,11 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
-              defaultValue={width}
+              value={width}
               min={5}
               max={20}
               onChange={(_, v) => setWidth(v as number)}
+              onChangeCommitted={(_, v) => setCommittedWidth(v as number)}
               size="small"
             />
           </div>
@@ -61,10 +64,11 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
-              defaultValue={height}
+              value={height}
               min={5}
               max={30}
               onChange={(_, v) => setHeight(v as number)}
+              onChangeCommitted={(_, v) => setCommittedHeight(v as number)}
               size="small"
             />
           </div>

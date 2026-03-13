@@ -155,9 +155,7 @@ export function useMinesweeper(settings: GameSettings) {
       if (prev.board[row][col].isRevealed) return prev;
       return { ...prev, board: toggleFlag(prev.board, row, col) };
     });
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
-    }
+
   }, []);
 
   const newGame = useCallback(() => {

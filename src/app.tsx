@@ -30,6 +30,14 @@ export default function App() {
     setEffect(null);
   }, []);
 
+  const handleReplayEffect = useCallback(() => {
+    if (game.status === GameStatus.Won) {
+      setEffect(null);
+      // Force re-mount by toggling off then on in next tick
+      requestAnimationFrame(() => setEffect('fireworks'));
+    }
+  }, [game.status]);
+
   const handlePlay = useCallback(() => {
     game.newGame();
     setScreen(Screen.Game);
@@ -45,6 +53,7 @@ export default function App() {
             status={game.displayStatus}
             onSmileyClick={game.newGame}
             onSettingsClick={() => setScreen(Screen.Options)}
+            onReplayEffect={handleReplayEffect}
           />
           <GameBoard
             board={game.board}

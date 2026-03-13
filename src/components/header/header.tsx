@@ -10,9 +10,10 @@ interface HeaderProps {
   status: GameStatus;
   onSmileyClick: () => void;
   onSettingsClick: () => void;
+  onReplayEffect?: () => void;
 }
 
-export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick }: HeaderProps) {
+export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick, onReplayEffect }: HeaderProps) {
   return (
     <div
       className="flex items-center justify-between px-2"
@@ -27,9 +28,9 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
       </IconButton>
 
       <div className="flex items-center gap-2">
-        <LedDisplay value={mineCount} />
+        <LedDisplay value={mineCount} onClick={onReplayEffect} />
         <SmileyButton status={status} onClick={onSmileyClick} />
-        <LedDisplay value={time} />
+        <LedDisplay value={time} onClick={onReplayEffect} />
       </div>
 
       <div style={{ width: 40 }} />

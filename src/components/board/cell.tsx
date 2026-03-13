@@ -28,6 +28,7 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressedRef = useRef(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
+  const isTouchRef = useRef(false);
 
   const isGameOver = gameStatus === GameStatus.Won || gameStatus === GameStatus.Lost || gameStatus === GameStatus.Review;
 
@@ -59,6 +60,7 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
 
   // Touch handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    isTouchRef.current = true;
     const touch = e.touches[0];
     startLongPress(touch.clientX, touch.clientY);
   }, [startLongPress]);
@@ -81,19 +83,26 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
 
   // Mouse handlers (PC long-press)
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (isTouchRef.current) return; // ignore synthetic mouse events from touch
     if (e.button !== 0) return; // left button only
     startLongPress(e.clientX, e.clientY);
   }, [startLongPress]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isTouchRef.current) return;
     checkMove(e.clientX, e.clientY);
   }, [checkMove]);
 
   const handleMouseUp = useCallback(() => {
+    if (isTouchRef.current) return;
     clearTimer();
   }, [clearTimer]);
 
   const handleClick = useCallback(() => {
+    if (isTouchRef.current) {
+      isTouchRef.current = false;
+      return;
+    }
     if (isGameOver || cell.isRevealed) return;
     if (longPressedRef.current) {
       longPressedRef.current = false;

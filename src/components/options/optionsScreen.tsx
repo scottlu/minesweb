@@ -50,7 +50,7 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
-              value={width}
+              defaultValue={width}
               min={5}
               max={20}
               onChange={(_, v) => setWidth(v as number)}
@@ -61,7 +61,7 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
-              value={height}
+              defaultValue={height}
               min={5}
               max={30}
               onChange={(_, v) => setHeight(v as number)}
@@ -72,7 +72,8 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={clampedMines}
+              key={maxMines}
+              defaultValue={clampedMines}
               min={1}
               max={maxMines}
               onChange={(_, v) => setMines(v as number)}

@@ -18,14 +18,10 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
   const [haptic, setHaptic] = useState(true);
-  const [committedWidth, setCommittedWidth] = useState(settings.width);
-  const [committedHeight, setCommittedHeight] = useState(settings.height);
-
-  const maxMines = Math.floor(committedWidth * committedHeight * 0.8);
-  const clampedMines = Math.min(mines, maxMines);
 
   const handlePlay = () => {
-    onUpdateSettings({ width, height, mines: clampedMines });
+    const maxMines = Math.floor(width * height * 0.8);
+    onUpdateSettings({ width, height, mines: Math.min(mines, maxMines) });
     onPlay();
   };
 
@@ -45,7 +41,7 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-2 mb-4">
             <span style={{ fontSize: 28 }}>😄</span>
             <span className="font-bold text-gray-800">
-              Custom - {width} x {height} / {clampedMines} Mines
+              Custom - {width} x {height} / {mines} Mines
             </span>
           </div>
 
@@ -56,7 +52,6 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
               min={5}
               max={20}
               onChange={(_, v) => setWidth(v as number)}
-              onChangeCommitted={(_, v) => setCommittedWidth(v as number)}
               size="small"
             />
           </div>
@@ -68,7 +63,6 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
               min={5}
               max={30}
               onChange={(_, v) => setHeight(v as number)}
-              onChangeCommitted={(_, v) => setCommittedHeight(v as number)}
               size="small"
             />
           </div>
@@ -76,9 +70,9 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={clampedMines}
+              value={mines}
               min={1}
-              max={maxMines}
+              max={200}
               onChange={(_, v) => setMines(v as number)}
               size="small"
             />

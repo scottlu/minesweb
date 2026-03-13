@@ -1,5 +1,6 @@
 import IconButton from '@mui/material/IconButton';
 import TuneIcon from '@mui/icons-material/Tune';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { LedDisplay } from './ledDisplay';
 import { SmileyButton } from './smileyButton';
 import { GameStatus } from '../../types/game';
@@ -33,7 +34,14 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
         <LedDisplay value={time} onClick={onReplayEffect} />
       </div>
 
-      <div style={{ width: 40 }} />
+      <IconButton
+        onClick={() => {
+          window.location.href = `/index.html?v=${Date.now()}`;
+        }}
+        size="small"
+      >
+        <RefreshIcon />
+      </IconButton>
     </div>
   );
 }

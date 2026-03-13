@@ -72,8 +72,7 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              key={maxMines}
-              defaultValue={clampedMines}
+              value={clampedMines}
               min={1}
               max={maxMines}
               onChange={(_, v) => setMines(v as number)}

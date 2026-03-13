@@ -36,7 +36,7 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
 
       <IconButton
         onClick={() => {
-          window.location.href = `/index.html?v=${Date.now()}`;
+          window.location.href = `/minesweb/index.html?v=${Date.now()}`;
         }}
         size="small"
       >

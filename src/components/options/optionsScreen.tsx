@@ -18,10 +18,40 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
 
+  const maxMines = Math.floor(width * height * 0.8);
+
   const handlePlay = () => {
-    const maxMines = Math.floor(width * height * 0.8);
     onUpdateSettings({ width, height, mines: Math.min(mines, maxMines) });
     onPlay();
+  };
+
+  const handleWidthChange = (_: Event, v: number | number[]) => {
+    const newWidth = v as number;
+    setWidth(newWidth);
+    const newMax = Math.floor(newWidth * height * 0.8);
+    if (mines > newMax) {
+      setMines(newMax);
+    }
+  };
+
+  const handleHeightChange = (_: Event, v: number | number[]) => {
+    const newHeight = v as number;
+    setHeight(newHeight);
+    const newMax = Math.floor(width * newHeight * 0.8);
+    if (mines > newMax) {
+      setMines(newMax);
+    }
+  };
+
+  const sliderSx = {
+    height: 8,
+    '& .MuiSlider-thumb': {
+      width: 28,
+      height: 28,
+    },
+    '& .MuiSlider-rail': {
+      opacity: 0.4,
+    },
   };
 
   return (
@@ -44,36 +74,39 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
             </span>
           </div>
 
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
               value={width}
               min={5}
               max={20}
-              onChange={(_, v) => setWidth(v as number)}
-              size="small"
+              onChange={handleWidthChange}
+              valueLabelDisplay="auto"
+              sx={sliderSx}
             />
           </div>
 
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-4">
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
               value={height}
               min={5}
               max={30}
-              onChange={(_, v) => setHeight(v as number)}
-              size="small"
+              onChange={handleHeightChange}
+              valueLabelDisplay="auto"
+              sx={sliderSx}
             />
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={mines}
+              value={Math.min(mines, maxMines)}
               min={1}
-              max={200}
+              max={maxMines}
               onChange={(_, v) => setMines(v as number)}
-              size="small"
+              valueLabelDisplay="auto"
+              sx={sliderSx}
             />
           </div>
         </div>

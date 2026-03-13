@@ -113,6 +113,7 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    if (isTouchRef.current) return; // touch long-press already handled flagging
     if (isGameOver || cell.isRevealed) return;
     onFlag(cell.row, cell.col);
   }, [isGameOver, cell.isRevealed, cell.row, cell.col, onFlag]);

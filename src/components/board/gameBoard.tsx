@@ -8,9 +8,10 @@ interface GameBoardProps {
   gameStatus: GameStatus;
   onReveal: (row: number, col: number) => void;
   onFlag: (row: number, col: number) => void;
+  onBoardTap?: () => void;
 }
 
-export function GameBoard({ board, gameStatus, onReveal, onFlag }: GameBoardProps) {
+export function GameBoard({ board, gameStatus, onReveal, onFlag, onBoardTap }: GameBoardProps) {
   const height = board.length;
   const width = board[0]?.length ?? 0;
 
@@ -23,7 +24,7 @@ export function GameBoard({ board, gameStatus, onReveal, onFlag }: GameBoardProp
   const boardWidth = cellSize * width + borderWidth * 2;
 
   return (
-    <div className="flex-1 flex justify-center overflow-hidden" style={{ touchAction: 'none' }}>
+    <div className="flex-1 flex justify-center overflow-hidden" style={{ touchAction: 'none' }} onClick={onBoardTap}>
       <div
         style={{
           display: 'grid',

@@ -1,4 +1,4 @@
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useRef } from 'react';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
 
@@ -18,6 +18,9 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
 
+  const widthRef = useRef(width);
+  const heightRef = useRef(height);
+
   const totalCells = width * height;
   const ratio = totalCells > 0 ? ((mines / totalCells) * 100).toFixed(1) : '0.0';
 
@@ -28,25 +31,29 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
 
   const handleWidthChange = useCallback((_: Event, v: number | number[]) => {
     const newWidth = v as number;
+    const oldWidth = widthRef.current;
+    widthRef.current = newWidth;
     setWidth(newWidth);
     setMines(prev => {
-      const oldTotal = width * height;
+      const oldTotal = oldWidth * heightRef.current;
       const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-      const newTotal = newWidth * height;
+      const newTotal = newWidth * heightRef.current;
       return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
     });
-  }, [width, height]);
+  }, []);
 
   const handleHeightChange = useCallback((_: Event, v: number | number[]) => {
     const newHeight = v as number;
+    const oldHeight = heightRef.current;
+    heightRef.current = newHeight;
     setHeight(newHeight);
     setMines(prev => {
-      const oldTotal = width * height;
+      const oldTotal = widthRef.current * oldHeight;
       const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-      const newTotal = width * newHeight;
+      const newTotal = widthRef.current * newHeight;
       return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
     });
-  }, [width, height]);
+  }, []);
 
   const handleMinesChange = useCallback((_: Event, v: number | number[]) => {
     setMines(v as number);

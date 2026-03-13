@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import TuneIcon from '@mui/icons-material/Tune';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -15,6 +16,8 @@ interface HeaderProps {
 }
 
 export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick, onReplayEffect }: HeaderProps) {
+  const [refreshing, setRefreshing] = useState(false);
+
   return (
     <div
       className="flex items-center justify-between px-2"
@@ -36,11 +39,22 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
 
       <IconButton
         onClick={() => {
-          window.location.href = `/minesweb/index.html?v=${Date.now()}`;
+          setRefreshing(true);
+          setTimeout(() => {
+            window.location.href = `/minesweb/index.html?v=${Date.now()}`;
+          }, 150);
         }}
         size="small"
       >
-        <RefreshIcon />
+        <RefreshIcon
+          sx={refreshing ? {
+            animation: 'spin 0.6s linear infinite',
+            '@keyframes spin': {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' },
+            },
+          } : undefined}
+        />
       </IconButton>
     </div>
   );

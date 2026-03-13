@@ -48,7 +48,7 @@ export default function App() {
   }, [game.newGame]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full game-fade-in">
       {screen === Screen.Game && (
         <>
           <Header

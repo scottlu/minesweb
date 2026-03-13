@@ -6,6 +6,10 @@ On the game board, pressing the happy face button creates a new game.
 
 The game should be written with typescript and react, using tailwind for styling. Use MUI as the component library.
 
+## Coding Style
+
+- No single-line conditionals. Always use braces and put the body on its own line.
+
 ## Comprehensive Project Summary
 
 ### Architecture

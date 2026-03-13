@@ -60,6 +60,7 @@ export default function App() {
             gameStatus={game.status}
             onReveal={game.handleReveal}
             onFlag={game.handleFlag}
+            onBoardTap={effect ? handleEffectComplete : undefined}
           />
           {effect && (
             <GameEffect onComplete={handleEffectComplete} />

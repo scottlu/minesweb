@@ -1,4 +1,4 @@
-import { memo, useRef, useCallback } from 'react';
+import { memo, useRef, useCallback, useState, useEffect } from 'react';
 import type { CellData } from '../../types/game';
 import { GameStatus } from '../../types/game';
 import '../../styles/cell.css';
@@ -29,6 +29,17 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
   const longPressedRef = useRef(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
   const isTouchRef = useRef(false);
+  const prevFlaggedRef = useRef(cell.isFlagged);
+  const [flagRemoving, setFlagRemoving] = useState(false);
+
+  useEffect(() => {
+    if (prevFlaggedRef.current && !cell.isFlagged && !cell.isRevealed) {
+      setFlagRemoving(true);
+      const timer = setTimeout(() => setFlagRemoving(false), 200);
+      return () => clearTimeout(timer);
+    }
+    prevFlaggedRef.current = cell.isFlagged;
+  }, [cell.isFlagged, cell.isRevealed]);
 
   const isGameOver = gameStatus === GameStatus.Won || gameStatus === GameStatus.Lost || gameStatus === GameStatus.Review;
 
@@ -131,12 +142,12 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
 
   let content = null;
 
-  if (cell.isFlagged && !cell.isRevealed) {
+  if ((cell.isFlagged || flagRemoving) && !cell.isRevealed) {
     const flagSize = cellSize * 0.6;
     content = (
       <svg
-        className="flag-icon"
-        key={`flag-${cell.row}-${cell.col}`}
+        className={flagRemoving ? 'flag-icon-removing' : 'flag-icon'}
+        key={`flag-${cell.row}-${cell.col}-${flagRemoving ? 'removing' : 'showing'}`}
         width={flagSize}
         height={flagSize}
         viewBox="0 0 24 24"

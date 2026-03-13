@@ -47,3 +47,19 @@
     opacity: 1;
   }
 }
+
+.flag-icon-removing {
+  position: absolute;
+  animation: flagDisappear 200ms ease-in forwards;
+}
+
+@keyframes flagDisappear {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(9);
+    opacity: 0;
+  }
+}

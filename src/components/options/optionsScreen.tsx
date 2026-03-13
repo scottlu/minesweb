@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
 
@@ -18,30 +18,39 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
 
-  const maxMines = Math.floor(width * height * 0.8);
+  const totalCells = width * height;
+  const ratio = totalCells > 0 ? ((mines / totalCells) * 100).toFixed(1) : '0.0';
 
-  const handlePlay = () => {
-    onUpdateSettings({ width, height, mines: Math.min(mines, maxMines) });
+  const handlePlay = useCallback(() => {
+    onUpdateSettings({ width, height, mines });
     onPlay();
-  };
+  }, [width, height, mines, onUpdateSettings, onPlay]);
 
-  const handleWidthChange = (_: Event, v: number | number[]) => {
+  const handleWidthChange = useCallback((_: Event, v: number | number[]) => {
     const newWidth = v as number;
     setWidth(newWidth);
-    const newMax = Math.floor(newWidth * height * 0.8);
-    if (mines > newMax) {
-      setMines(newMax);
-    }
-  };
+    setMines(prev => {
+      const oldTotal = width * height;
+      const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
+      const newTotal = newWidth * height;
+      return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    });
+  }, [width, height]);
 
-  const handleHeightChange = (_: Event, v: number | number[]) => {
+  const handleHeightChange = useCallback((_: Event, v: number | number[]) => {
     const newHeight = v as number;
     setHeight(newHeight);
-    const newMax = Math.floor(width * newHeight * 0.8);
-    if (mines > newMax) {
-      setMines(newMax);
-    }
-  };
+    setMines(prev => {
+      const oldTotal = width * height;
+      const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
+      const newTotal = width * newHeight;
+      return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    });
+  }, [width, height]);
+
+  const handleMinesChange = useCallback((_: Event, v: number | number[]) => {
+    setMines(v as number);
+  }, []);
 
   const sliderSx = {
     height: 8,
@@ -70,7 +79,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-2 mb-4">
             <span style={{ fontSize: 28 }}>😄</span>
             <span className="font-bold text-gray-800">
-              Custom - {width} x {height} / {mines} Mines
+              Custom - {width} x {height} / {mines} Mines ({ratio}%)
             </span>
           </div>
 
@@ -101,10 +110,10 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={Math.min(mines, maxMines)}
+              value={mines}
               min={1}
-              max={maxMines}
-              onChange={(_, v) => setMines(v as number)}
+              max={totalCells}
+              onChange={handleMinesChange}
               valueLabelDisplay="auto"
               sx={sliderSx}
             />

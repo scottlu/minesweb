@@ -38,6 +38,10 @@ export default function App() {
     }
   }, [game.status]);
 
+  const handleBack = useCallback(() => {
+    setScreen(Screen.Game);
+  }, []);
+
   const handlePlay = useCallback(() => {
     game.newGame();
     setScreen(Screen.Game);
@@ -71,7 +75,7 @@ export default function App() {
         <OptionsScreen
           settings={settings}
           onUpdateSettings={updateSettings}
-          onBack={() => setScreen(Screen.Game)}
+          onBack={handleBack}
           onPlay={handlePlay}
         />
       )}

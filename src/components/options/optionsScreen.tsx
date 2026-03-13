@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
 
@@ -13,7 +13,7 @@ interface OptionsScreenProps {
   onPlay: () => void;
 }
 
-export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: OptionsScreenProps) {
+export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: OptionsScreenProps) {
   const [width, setWidth] = useState(settings.width);
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
@@ -117,4 +117,4 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
       </div>
     </div>
   );
-}
+});

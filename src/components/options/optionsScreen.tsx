@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
-import Switch from '@mui/material/Switch';
+
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import type { GameSettings } from '../../types/game';
@@ -17,13 +17,10 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
   const [width, setWidth] = useState(settings.width);
   const [height, setHeight] = useState(settings.height);
   const [mines, setMines] = useState(settings.mines);
-  const [haptic, setHaptic] = useState(true);
-
-  const maxMines = Math.floor(width * height * 0.8);
-  const clampedMines = Math.min(mines, maxMines);
 
   const handlePlay = () => {
-    onUpdateSettings({ width, height, mines: clampedMines });
+    const maxMines = Math.floor(width * height * 0.8);
+    onUpdateSettings({ width, height, mines: Math.min(mines, maxMines) });
     onPlay();
   };
 
@@ -43,14 +40,14 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-2 mb-4">
             <span style={{ fontSize: 28 }}>😄</span>
             <span className="font-bold text-gray-800">
-              Custom - {width} x {height} / {clampedMines} Mines
+              Custom - {width} x {height} / {mines} Mines
             </span>
           </div>
 
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
-              defaultValue={width}
+              value={width}
               min={5}
               max={20}
               onChange={(_, v) => setWidth(v as number)}
@@ -61,7 +58,7 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3 mb-2">
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
-              defaultValue={height}
+              value={height}
               min={5}
               max={30}
               onChange={(_, v) => setHeight(v as number)}
@@ -72,9 +69,9 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
           <div className="flex items-center gap-3">
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={clampedMines}
+              value={mines}
               min={1}
-              max={maxMines}
+              max={200}
               onChange={(_, v) => setMines(v as number)}
               size="small"
             />
@@ -84,14 +81,6 @@ export function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: Op
         <Button variant="contained" size="large" fullWidth onClick={handlePlay}>
           Play
         </Button>
-
-        <div
-          className="flex items-center justify-between rounded-lg p-3"
-          style={{ border: '1px solid #ddd', background: '#fff' }}
-        >
-          <span className="text-gray-700">Haptic Feedback</span>
-          <Switch checked={haptic} onChange={(_, v) => setHaptic(v)} />
-        </div>
       </div>
     </div>
   );

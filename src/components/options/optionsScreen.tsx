@@ -1,4 +1,5 @@
 import { memo, useState, useCallback, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
 
@@ -12,6 +13,17 @@ interface OptionsScreenProps {
   onBack: () => void;
   onPlay: () => void;
 }
+
+const sliderSx = {
+  height: 8,
+  '& .MuiSlider-thumb': {
+    width: 28,
+    height: 28,
+  },
+  '& .MuiSlider-rail': {
+    opacity: 0.4,
+  },
+};
 
 export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: OptionsScreenProps) {
   const [width, setWidth] = useState(settings.width);
@@ -33,12 +45,18 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     const newWidth = v as number;
     const oldWidth = widthRef.current;
     widthRef.current = newWidth;
-    setWidth(newWidth);
-    setMines(prev => {
-      const oldTotal = oldWidth * heightRef.current;
-      const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-      const newTotal = newWidth * heightRef.current;
-      return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    // flushSync forces React to process state updates synchronously.
+    // Without it, React 18's automatic batching defers the update, and
+    // MUI Slider sees the stale value prop before React re-renders,
+    // causing the thumb to snap back to its previous position.
+    flushSync(() => {
+      setWidth(newWidth);
+      setMines(prev => {
+        const oldTotal = oldWidth * heightRef.current;
+        const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
+        const newTotal = newWidth * heightRef.current;
+        return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+      });
     });
   }, []);
 
@@ -46,29 +64,22 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     const newHeight = v as number;
     const oldHeight = heightRef.current;
     heightRef.current = newHeight;
-    setHeight(newHeight);
-    setMines(prev => {
-      const oldTotal = widthRef.current * oldHeight;
-      const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-      const newTotal = widthRef.current * newHeight;
-      return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    flushSync(() => {
+      setHeight(newHeight);
+      setMines(prev => {
+        const oldTotal = widthRef.current * oldHeight;
+        const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
+        const newTotal = widthRef.current * newHeight;
+        return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+      });
     });
   }, []);
 
   const handleMinesChange = useCallback((_: Event, v: number | number[]) => {
-    setMines(v as number);
+    flushSync(() => {
+      setMines(v as number);
+    });
   }, []);
-
-  const sliderSx = {
-    height: 8,
-    '& .MuiSlider-thumb': {
-      width: 28,
-      height: 28,
-    },
-    '& .MuiSlider-rail': {
-      opacity: 0.4,
-    },
-  };
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#f5f5f5' }}>
@@ -90,7 +101,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
             </span>
           </div>
 
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
               value={width}
@@ -102,7 +113,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
             />
           </div>
 
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
               value={height}
@@ -114,7 +125,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
             />
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
               value={mines}

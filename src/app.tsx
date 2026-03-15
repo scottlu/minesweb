@@ -55,11 +55,12 @@ export default function App() {
             mineCount={game.mineCount}
             time={game.time}
             status={game.displayStatus}
-            onSmileyClick={game.newGame}
+            onSmileyClick={() => { setEffect(null); game.newGame(); }}
             onSettingsClick={() => setScreen(Screen.Options)}
             onReplayEffect={handleReplayEffect}
           />
           <GameBoard
+            key={game.gameId}
             board={game.board}
             gameStatus={game.status}
             onReveal={game.handleReveal}

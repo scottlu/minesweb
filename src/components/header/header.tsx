@@ -46,10 +46,12 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
 
   const handleRefresh = () => {
     setRefreshState('loading');
-    const url = new URL(window.location.href);
-    url.searchParams.set('v', String(Date.now()));
-    url.searchParams.set('reloaded', '1');
-    window.location.href = url.toString();
+    requestAnimationFrame(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('v', String(Date.now()));
+      url.searchParams.set('reloaded', '1');
+      window.location.href = url.toString();
+    });
   };
 
   return (

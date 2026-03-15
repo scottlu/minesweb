@@ -1,5 +1,4 @@
 import { memo, useState, useCallback, useRef } from 'react';
-import { flushSync } from 'react-dom';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
 
@@ -26,59 +25,70 @@ const sliderSx = {
 };
 
 export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSettings, onBack, onPlay }: OptionsScreenProps) {
-  const [width, setWidth] = useState(settings.width);
-  const [height, setHeight] = useState(settings.height);
-  const [mines, setMines] = useState(settings.mines);
+  // Refs are the source of truth during drag; state drives the text display.
+  // Sliders are uncontrolled (defaultValue) so MUI manages thumb position
+  // natively — no React batching timing issues.
+  const widthRef = useRef(settings.width);
+  const heightRef = useRef(settings.height);
+  const minesRef = useRef(settings.mines);
 
-  const widthRef = useRef(width);
-  const heightRef = useRef(height);
+  // State is only used for the header text display and Play button commit.
+  const [display, setDisplay] = useState({
+    width: settings.width,
+    height: settings.height,
+    mines: settings.mines,
+  });
 
-  const totalCells = width * height;
-  const ratio = totalCells > 0 ? ((mines / totalCells) * 100).toFixed(1) : '0.0';
+  // Key for the mines slider — forces remount when dimensions change so
+  // its defaultValue and max update to reflect the new grid size.
+  const [minesSliderKey, setMinesSliderKey] = useState(0);
+
+  const totalCells = display.width * display.height;
+  const ratio = totalCells > 0 ? ((display.mines / totalCells) * 100).toFixed(1) : '0.0';
 
   const handlePlay = useCallback(() => {
-    onUpdateSettings({ width, height, mines });
+    onUpdateSettings({
+      width: widthRef.current,
+      height: heightRef.current,
+      mines: minesRef.current,
+    });
     onPlay();
-  }, [width, height, mines, onUpdateSettings, onPlay]);
+  }, [onUpdateSettings, onPlay]);
 
   const handleWidthChange = useCallback((_: Event, v: number | number[]) => {
     const newWidth = v as number;
     const oldWidth = widthRef.current;
     widthRef.current = newWidth;
-    // flushSync forces React to process state updates synchronously.
-    // Without it, React 18's automatic batching defers the update, and
-    // MUI Slider sees the stale value prop before React re-renders,
-    // causing the thumb to snap back to its previous position.
-    flushSync(() => {
-      setWidth(newWidth);
-      setMines(prev => {
-        const oldTotal = oldWidth * heightRef.current;
-        const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-        const newTotal = newWidth * heightRef.current;
-        return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
-      });
-    });
+
+    const oldTotal = oldWidth * heightRef.current;
+    const currentRatio = oldTotal > 0 ? minesRef.current / oldTotal : 0;
+    const newTotal = newWidth * heightRef.current;
+    const newMines = Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    minesRef.current = newMines;
+
+    setDisplay({ width: newWidth, height: heightRef.current, mines: newMines });
+    setMinesSliderKey(k => k + 1);
   }, []);
 
   const handleHeightChange = useCallback((_: Event, v: number | number[]) => {
     const newHeight = v as number;
     const oldHeight = heightRef.current;
     heightRef.current = newHeight;
-    flushSync(() => {
-      setHeight(newHeight);
-      setMines(prev => {
-        const oldTotal = widthRef.current * oldHeight;
-        const currentRatio = oldTotal > 0 ? prev / oldTotal : 0;
-        const newTotal = widthRef.current * newHeight;
-        return Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
-      });
-    });
+
+    const oldTotal = widthRef.current * oldHeight;
+    const currentRatio = oldTotal > 0 ? minesRef.current / oldTotal : 0;
+    const newTotal = widthRef.current * newHeight;
+    const newMines = Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
+    minesRef.current = newMines;
+
+    setDisplay({ width: widthRef.current, height: newHeight, mines: newMines });
+    setMinesSliderKey(k => k + 1);
   }, []);
 
   const handleMinesChange = useCallback((_: Event, v: number | number[]) => {
-    flushSync(() => {
-      setMines(v as number);
-    });
+    const newMines = v as number;
+    minesRef.current = newMines;
+    setDisplay(prev => ({ ...prev, mines: newMines }));
   }, []);
 
   return (
@@ -97,14 +107,14 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-2 mb-4">
             <span style={{ fontSize: 28 }}>😄</span>
             <span className="font-bold text-gray-800">
-              Custom - {width} x {height} / {mines} Mines ({ratio}%)
+              Custom - {display.width} x {display.height} / {display.mines} Mines ({ratio}%)
             </span>
           </div>
 
           <div className="flex items-center gap-3 mb-4" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Width</span>
             <Slider
-              value={width}
+              defaultValue={settings.width}
               min={5}
               max={20}
               onChange={handleWidthChange}
@@ -116,7 +126,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-3 mb-4" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Height</span>
             <Slider
-              value={height}
+              defaultValue={settings.height}
               min={5}
               max={30}
               onChange={handleHeightChange}
@@ -128,7 +138,8 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-3" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              value={mines}
+              key={minesSliderKey}
+              defaultValue={minesRef.current}
               min={1}
               max={totalCells}
               onChange={handleMinesChange}

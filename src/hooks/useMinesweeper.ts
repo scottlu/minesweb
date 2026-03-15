@@ -75,6 +75,8 @@ export function useMinesweeper(settings: GameSettings) {
     loaded.current ? loaded.current.state : makeDefaultState(settings)
   );
 
+  const [gameId, setGameId] = useState(0);
+
   const settingsRef = useRef(settings);
   const preReviewStatusRef = useRef<GameStatus>(GameStatus.Idle);
 
@@ -160,6 +162,7 @@ export function useMinesweeper(settings: GameSettings) {
 
   const newGame = useCallback(() => {
     setState(makeDefaultState(settings));
+    setGameId(id => id + 1);
     resetTimer();
     clearSave();
   }, [settings, resetTimer]);
@@ -197,6 +200,7 @@ export function useMinesweeper(settings: GameSettings) {
     flagCount,
     mineCount,
     time,
+    gameId,
     handleReveal,
     handleFlag,
     newGame,

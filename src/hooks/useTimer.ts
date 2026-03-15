@@ -13,7 +13,7 @@ export function useTimer(isRunning: boolean, initialTime = 0) {
 
     startRef.current = Date.now() - time * 1000;
     const interval = setInterval(() => {
-      if (startRef.current !== null) {
+      if (startRef.current !== null && hiddenAtRef.current === null) {
         setTime(Math.floor((Date.now() - startRef.current) / 1000));
       }
     }, 1000);
@@ -32,6 +32,8 @@ export function useTimer(isRunning: boolean, initialTime = 0) {
           // so the hidden time is not counted
           const hiddenDuration = Date.now() - hiddenAtRef.current;
           startRef.current += hiddenDuration;
+          // Force an immediate time update so the display refreshes
+          setTime(Math.floor((Date.now() - startRef.current) / 1000));
         }
         hiddenAtRef.current = null;
       }

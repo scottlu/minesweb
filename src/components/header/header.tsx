@@ -23,6 +23,39 @@ function getInitialRefreshState(): RefreshState {
   return 'idle';
 }
 
+async function updateServiceWorker(): Promise<void> {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  const registration = await navigator.serviceWorker.getRegistration();
+  if (!registration) {
+    return;
+  }
+
+  // Force check for a new service worker
+  await registration.update();
+
+  // With registerType: 'autoUpdate', the new SW calls skipWaiting() on install,
+  // so it activates immediately. If there's still a waiting worker, wait for it
+  // to take control before reloading.
+  if (registration.waiting || registration.installing) {
+    await new Promise<void>((resolve) => {
+      const onControllerChange = () => {
+        navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+        resolve();
+      };
+      navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+
+      // Don't wait forever
+      setTimeout(() => {
+        navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+        resolve();
+      }, 3000);
+    });
+  }
+}
+
 interface HeaderProps {
   mineCount: number;
   time: number;
@@ -44,14 +77,12 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
     }
   }, [refreshState]);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshState('loading');
-    requestAnimationFrame(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.set('v', String(Date.now()));
-      url.searchParams.set('reloaded', '1');
-      window.location.href = url.toString();
-    });
+    await updateServiceWorker();
+    const url = new URL(window.location.href);
+    url.searchParams.set('reloaded', '1');
+    window.location.href = url.toString();
   };
 
   return (

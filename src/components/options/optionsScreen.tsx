@@ -41,10 +41,6 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     showTimer: settings.showTimer,
   });
 
-  // Key for the mines slider — forces remount when dimensions change so
-  // its defaultValue and max update to reflect the new grid size.
-  const [minesSliderKey, setMinesSliderKey] = useState(0);
-
   const totalCells = display.width * display.height;
   const ratio = totalCells > 0 ? ((display.mines / totalCells) * 100).toFixed(1) : '0.0';
 
@@ -73,8 +69,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     const newMines = Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
     minesRef.current = newMines;
 
-    setDisplay({ width: newWidth, height: heightRef.current, mines: newMines });
-    setMinesSliderKey(k => k + 1);
+    setDisplay(prev => ({ ...prev, width: newWidth, mines: newMines }));
   }, []);
 
   const handleHeightChange = useCallback((_: Event, v: number | number[]) => {
@@ -88,8 +83,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     const newMines = Math.max(1, Math.min(newTotal, Math.round(currentRatio * newTotal)));
     minesRef.current = newMines;
 
-    setDisplay({ width: widthRef.current, height: newHeight, mines: newMines });
-    setMinesSliderKey(k => k + 1);
+    setDisplay(prev => ({ ...prev, height: newHeight, mines: newMines }));
   }, []);
 
   const handleMinesChange = useCallback((_: Event, v: number | number[]) => {
@@ -145,8 +139,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
           <div className="flex items-center gap-3" style={{ touchAction: 'none' }}>
             <span className="text-gray-700 w-14 text-sm font-medium">Mines</span>
             <Slider
-              key={minesSliderKey}
-              defaultValue={minesRef.current}
+              value={display.mines}
               min={1}
               max={totalCells}
               onChange={handleMinesChange}

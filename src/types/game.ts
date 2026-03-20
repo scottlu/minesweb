@@ -23,6 +23,7 @@ export interface GameSettings {
   width: number;
   height: number;
   mines: number;
+  showTimer: boolean;
 }
 
 export const Screen = {

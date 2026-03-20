@@ -1,6 +1,7 @@
 import { memo, useState, useCallback, useRef } from 'react';
 import Slider from '@mui/material/Slider';
 import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
 
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -37,6 +38,7 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
     width: settings.width,
     height: settings.height,
     mines: settings.mines,
+    showTimer: settings.showTimer,
   });
 
   // Key for the mines slider — forces remount when dimensions change so
@@ -45,6 +47,11 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
 
   const totalCells = display.width * display.height;
   const ratio = totalCells > 0 ? ((display.mines / totalCells) * 100).toFixed(1) : '0.0';
+
+  const handleShowTimerChange = useCallback((_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    setDisplay(prev => ({ ...prev, showTimer: checked }));
+    onUpdateSettings({ showTimer: checked });
+  }, [onUpdateSettings]);
 
   const handlePlay = useCallback(() => {
     onUpdateSettings({
@@ -145,6 +152,14 @@ export const OptionsScreen = memo(function OptionsScreen({ settings, onUpdateSet
               onChange={handleMinesChange}
               valueLabelDisplay="auto"
               sx={sliderSx}
+            />
+          </div>
+
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-gray-700 text-sm font-medium">Show Timer</span>
+            <Switch
+              checked={display.showTimer}
+              onChange={handleShowTimerChange}
             />
           </div>
         </div>

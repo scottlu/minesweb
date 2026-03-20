@@ -60,12 +60,13 @@ interface HeaderProps {
   mineCount: number;
   time: number;
   status: GameStatus;
+  showTimer: boolean;
   onSmileyClick: () => void;
   onSettingsClick: () => void;
   onReplayEffect?: () => void;
 }
 
-export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick, onReplayEffect }: HeaderProps) {
+export function Header({ mineCount, time, status, showTimer, onSmileyClick, onSettingsClick, onReplayEffect }: HeaderProps) {
   const [refreshState, setRefreshState] = useState<RefreshState>(getInitialRefreshState);
 
   useEffect(() => {
@@ -87,38 +88,42 @@ export function Header({ mineCount, time, status, onSmileyClick, onSettingsClick
 
   return (
     <div
-      className="flex items-center justify-between px-2"
+      className="relative flex items-center justify-center px-2"
       style={{
         height: 56,
         background: '#c0c0c0',
         borderBottom: '2px solid #808080',
       }}
     >
-      <IconButton onClick={onSettingsClick} size="small">
-        <TuneIcon />
-      </IconButton>
+      <div className="absolute left-2">
+        <IconButton onClick={onSettingsClick} size="small">
+          <TuneIcon />
+        </IconButton>
+      </div>
 
       <div className="flex items-center gap-2">
         <LedDisplay value={mineCount} onClick={onReplayEffect} />
         <SmileyButton status={status} onClick={onSmileyClick} />
-        <LedDisplay value={time} onClick={onReplayEffect} />
+        {showTimer && <LedDisplay value={time} onClick={onReplayEffect} />}
       </div>
 
-      {refreshState === 'loading' && (
-        <IconButton size="small" disabled>
-          <CircularProgress size={24} sx={{ color: '#616161' }} />
-        </IconButton>
-      )}
-      {refreshState === 'done' && (
-        <IconButton size="small" disabled>
-          <CheckCircleIcon sx={{ color: '#4caf50' }} />
-        </IconButton>
-      )}
-      {refreshState === 'idle' && (
-        <IconButton onClick={handleRefresh} size="small">
-          <RefreshIcon />
-        </IconButton>
-      )}
+      <div className="absolute right-2">
+        {refreshState === 'loading' && (
+          <IconButton size="small" disabled>
+            <CircularProgress size={24} sx={{ color: '#616161' }} />
+          </IconButton>
+        )}
+        {refreshState === 'done' && (
+          <IconButton size="small" disabled>
+            <CheckCircleIcon sx={{ color: '#4caf50' }} />
+          </IconButton>
+        )}
+        {refreshState === 'idle' && (
+          <IconButton onClick={handleRefresh} size="small">
+            <RefreshIcon />
+          </IconButton>
+        )}
+      </div>
     </div>
   );
 }

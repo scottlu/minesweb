@@ -20,7 +20,7 @@ function computeDefaultSettings(): GameSettings {
   const height = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, Math.floor(availableHeight / TARGET_CELL_SIZE)));
   const mines = Math.max(1, Math.round(width * height * 0.2));
 
-  return { width, height, mines };
+  return { width, height, mines, showTimer: false };
 }
 
 function loadSettings(): GameSettings {

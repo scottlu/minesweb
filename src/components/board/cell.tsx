@@ -27,6 +27,7 @@ const LONG_PRESS_MS = 400;
 export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, onFlag }: CellProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressedRef = useRef(false);
+  const movedRef = useRef(false);
   const startPosRef = useRef<{ x: number; y: number } | null>(null);
   const isTouchRef = useRef(false);
   const prevFlaggedRef = useRef(cell.isFlagged);
@@ -53,6 +54,7 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
   const startLongPress = useCallback((x: number, y: number) => {
     if (isGameOver || cell.isRevealed) return;
     longPressedRef.current = false;
+    movedRef.current = false;
     startPosRef.current = { x, y };
     timerRef.current = setTimeout(() => {
       longPressedRef.current = true;
@@ -66,6 +68,7 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
     const dy = y - startPosRef.current.y;
     if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
       clearTimer();
+      movedRef.current = true;
     }
   }, [clearTimer]);
 
@@ -83,8 +86,14 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     clearTimer();
-    if (isGameOver || cell.isRevealed) return;
+    if (isGameOver || cell.isRevealed) {
+      return;
+    }
     if (longPressedRef.current) {
+      e.preventDefault();
+      return;
+    }
+    if (movedRef.current) {
       e.preventDefault();
       return;
     }
@@ -114,9 +123,14 @@ export const Cell = memo(function Cell({ cell, cellSize, gameStatus, onReveal, o
       isTouchRef.current = false;
       return;
     }
-    if (isGameOver || cell.isRevealed) return;
+    if (isGameOver || cell.isRevealed) {
+      return;
+    }
     if (longPressedRef.current) {
       longPressedRef.current = false;
+      return;
+    }
+    if (movedRef.current) {
       return;
     }
     onReveal(cell.row, cell.col);

@@ -6,20 +6,21 @@ import { Cell } from './cell';
 interface GameBoardProps {
   board: Board;
   gameStatus: GameStatus;
+  effectiveWidth: number;
   onReveal: (row: number, col: number) => void;
   onFlag: (row: number, col: number) => void;
   onBoardTap?: () => void;
 }
 
-export function GameBoard({ board, gameStatus, onReveal, onFlag, onBoardTap }: GameBoardProps) {
+export function GameBoard({ board, gameStatus, effectiveWidth, onReveal, onFlag, onBoardTap }: GameBoardProps) {
   const height = board.length;
   const width = board[0]?.length ?? 0;
 
   const borderWidth = 3;
   const cellSize = useMemo(() => {
-    const maxWidth = Math.min(window.innerWidth, 500);
+    const maxWidth = Math.min(effectiveWidth, 500);
     return Math.floor((maxWidth - borderWidth * 2) / width);
-  }, [width]);
+  }, [width, effectiveWidth]);
 
   const boardWidth = cellSize * width + borderWidth * 2;
 

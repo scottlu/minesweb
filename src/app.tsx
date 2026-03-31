@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Screen, GameStatus } from './types/game';
 import { useMinesweeper } from './hooks/useMinesweeper';
 import { useSettings } from './hooks/useSettings';
+import { useOrientation } from './hooks/useOrientation';
 import { Header } from './components/header/header';
 import { GameBoard } from './components/board/gameBoard';
 import { GameEffect } from './components/gameOver/gameEffect';
@@ -11,6 +12,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(Screen.Game);
   const { settings, updateSettings } = useSettings();
   const game = useMinesweeper(settings);
+  const { isLandscape } = useOrientation();
   const [effect, setEffect] = useState<'fireworks' | null>(null);
   const prevStatusRef = useRef(game.status);
 
@@ -47,8 +49,24 @@ export default function App() {
     setScreen(Screen.Game);
   }, [game.newGame]);
 
+  const rotationStyle = useMemo(() => {
+    if (!isLandscape) {
+      return undefined;
+    }
+    return {
+      transform: 'rotate(-90deg)',
+      transformOrigin: 'top left',
+      width: window.innerHeight,
+      height: window.innerWidth,
+      position: 'fixed' as const,
+      top: window.innerHeight,
+      left: 0,
+      overflow: 'hidden',
+    };
+  }, [isLandscape]);
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={rotationStyle}>
       {screen === Screen.Game && (
         <>
           <Header
@@ -64,6 +82,7 @@ export default function App() {
             key={game.gameId}
             board={game.board}
             gameStatus={game.status}
+            effectiveWidth={isLandscape ? window.innerHeight : window.innerWidth}
             onReveal={game.handleReveal}
             onFlag={game.handleFlag}
             onBoardTap={effect ? handleEffectComplete : undefined}

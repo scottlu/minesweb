@@ -8,9 +8,9 @@ import App from './app.tsx'
 const theme = createTheme({})
 
 // Lock orientation to portrait on supported devices
-screen.orientation?.lock?.('portrait').catch(() => {
-  // Orientation lock not supported or not in fullscreen — handled by CSS fallback
-})
+// Lock orientation to portrait on supported devices (e.g. Android PWA)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(screen.orientation as any)?.lock?.('portrait').catch(() => {})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

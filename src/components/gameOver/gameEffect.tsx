@@ -69,7 +69,7 @@ export function GameEffect({ onComplete }: GameEffectProps) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let particles: Particle[] = [];
+    const particles: Particle[] = [];
     let frame = 0;
     let animId: number;
     const totalFrames = 280;

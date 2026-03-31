@@ -15,6 +15,7 @@ export default defineConfig({
         short_name: 'Mines',
         start_url: '.',
         display: 'standalone',
+        orientation: 'portrait',
         background_color: '#c0c0c0',
         theme_color: '#c0c0c0',
         icons: [

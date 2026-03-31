@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Screen, GameStatus } from './types/game';
 import { useMinesweeper } from './hooks/useMinesweeper';
 import { useSettings } from './hooks/useSettings';
@@ -7,12 +7,17 @@ import { Header } from './components/header/header';
 import { GameBoard } from './components/board/gameBoard';
 import { GameEffect } from './components/gameOver/gameEffect';
 import { OptionsScreen } from './components/options/optionsScreen';
+import { transposeBoard } from './utils/transpose';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>(Screen.Game);
   const { settings, updateSettings } = useSettings();
   const game = useMinesweeper(settings);
   const { isLandscape } = useOrientation();
+  const displayBoard = useMemo(
+    () => (isLandscape ? transposeBoard(game.board) : game.board),
+    [game.board, isLandscape]
+  );
   const [effect, setEffect] = useState<'fireworks' | null>(null);
   const prevStatusRef = useRef(game.status);
 
@@ -64,9 +69,10 @@ export default function App() {
           />
           <GameBoard
             key={game.gameId}
-            board={game.board}
+            board={displayBoard}
             gameStatus={game.status}
-            effectiveWidth={isLandscape ? window.innerHeight : window.innerWidth}
+            effectiveWidth={window.innerWidth}
+            effectiveHeight={window.innerHeight}
             onReveal={game.handleReveal}
             onFlag={game.handleFlag}
             onBoardTap={effect ? handleEffectComplete : undefined}

@@ -5,9 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline'
 import './index.css'
 import App from './app.tsx'
 
-const theme = createTheme({})
+const theme = createTheme({});
 
-// Lock orientation to portrait on supported devices
 // Lock orientation to portrait on supported devices (e.g. Android PWA)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (screen.orientation as any)?.lock?.('portrait').catch(() => {})

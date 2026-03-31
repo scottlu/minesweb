@@ -18,3 +18,17 @@ html, body, #root {
   user-select: none;
   -webkit-touch-callout: none;
 }
+
+/* Force portrait layout when device is in landscape on phones */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-root {
+    transform: rotate(-90deg);
+    transform-origin: top left;
+    width: 100dvh;
+    height: 100dvw;
+    position: fixed;
+    top: 100dvh;
+    left: 0;
+    overflow: hidden;
+  }
+}

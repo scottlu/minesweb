@@ -7,20 +7,26 @@ interface GameBoardProps {
   board: Board;
   gameStatus: GameStatus;
   effectiveWidth: number;
+  effectiveHeight: number;
   onReveal: (row: number, col: number) => void;
   onFlag: (row: number, col: number) => void;
   onBoardTap?: () => void;
 }
 
-export function GameBoard({ board, gameStatus, effectiveWidth, onReveal, onFlag, onBoardTap }: GameBoardProps) {
+const HEADER_HEIGHT = 58;
+
+export function GameBoard({ board, gameStatus, effectiveWidth, effectiveHeight, onReveal, onFlag, onBoardTap }: GameBoardProps) {
   const height = board.length;
   const width = board[0]?.length ?? 0;
 
   const borderWidth = 3;
   const cellSize = useMemo(() => {
     const maxWidth = Math.min(effectiveWidth, 500);
-    return Math.floor((maxWidth - borderWidth * 2) / width);
-  }, [width, effectiveWidth]);
+    const widthBased = Math.floor((maxWidth - borderWidth * 2) / width);
+    const availableHeight = effectiveHeight - HEADER_HEIGHT;
+    const heightBased = Math.floor((availableHeight - borderWidth * 2) / height);
+    return Math.min(widthBased, heightBased);
+  }, [width, height, effectiveWidth, effectiveHeight]);
 
   const boardWidth = cellSize * width + borderWidth * 2;
 

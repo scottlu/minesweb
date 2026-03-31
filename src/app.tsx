@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Screen, GameStatus } from './types/game';
 import { useMinesweeper } from './hooks/useMinesweeper';
 import { useSettings } from './hooks/useSettings';
@@ -49,24 +49,8 @@ export default function App() {
     setScreen(Screen.Game);
   }, [game.newGame]);
 
-  const rotationStyle = useMemo(() => {
-    if (!isLandscape) {
-      return undefined;
-    }
-    return {
-      transform: 'rotate(-90deg)',
-      transformOrigin: 'top left',
-      width: window.innerHeight,
-      height: window.innerWidth,
-      position: 'fixed' as const,
-      top: window.innerHeight,
-      left: 0,
-      overflow: 'hidden',
-    };
-  }, [isLandscape]);
-
   return (
-    <div className="flex flex-col h-full" style={rotationStyle}>
+    <div className="app-root flex flex-col h-full">
       {screen === Screen.Game && (
         <>
           <Header
